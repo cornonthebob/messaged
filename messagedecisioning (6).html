@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Message Decisioning — The Missing Layer in Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --graphite:  #1c2130;
+    --navy:      #243047;
+    --slate:     #3d5166;
+    --fog:       #f4f5f7;
+    --white:     #ffffff;
+    --border:    #dde1e8;
+    --mid:       #6b7585;
+    --accent:    #2e6da4;
+    --accent-lt: #e8f0f8;
+    --warn:      #b03a2e;
+    --go:        #1e6b45;
+    --go-lt:     #e6f4ec;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--white);
+    color: var(--graphite);
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 60px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--graphite); text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo::before {
+    content: ''; width: 8px; height: 8px;
+    background: var(--accent); border-radius: 50%; flex-shrink: 0;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: 13px; color: var(--mid); text-decoration: none;
+    transition: color 0.15s; letter-spacing: 0.01em;
+  }
+  .nav-links a:hover { color: var(--graphite); }
+  .nav-cta {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent);
+    padding: 8px 18px; text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-cta:hover { background: var(--accent); color: var(--white); }
+
+  /* LAYOUT */
+  section { padding: 96px 48px; }
+  .container { max-width: 1080px; margin: 0 auto; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px; display: block;
+  }
+  h1 {
+    font-family: 'IBM Plex Serif', serif; font-weight: 300;
+    font-size: clamp(36px, 5vw, 62px);
+    line-height: 1.1; letter-spacing: -0.01em;
+    color: var(--graphite); max-width: 700px; margin-bottom: 24px;
+  }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 300; }
+  h2 {
+    font-family: 'IBM Plex Serif', serif; font-weight: 300;
+    font-size: clamp(26px, 3.2vw, 42px);
+    line-height: 1.15; letter-spacing: -0.01em;
+    color: var(--graphite); margin-bottom: 20px;
+  }
+  h3 {
+    font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
+    font-size: 15px; line-height: 1.4; color: var(--graphite); margin-bottom: 8px;
+  }
+  p { color: var(--mid); line-height: 1.7; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh; display: flex; align-items: center;
+    padding-top: 120px; background: var(--fog);
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  #hero::after {
+    content: '';
+    position: absolute; top: 0; right: 0; bottom: 0; width: 36%;
+    background: linear-gradient(160deg, var(--graphite) 0%, var(--navy) 100%);
+    clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .hero-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); display: flex; align-items: center; gap: 10px;
+    margin-bottom: 28px;
+  }
+  .hero-label::before { content: ''; width: 28px; height: 1px; background: var(--accent); }
+  .hero-sub {
+    font-family: 'IBM Plex Serif', serif; font-style: italic;
+    font-size: 18px; font-weight: 300; color: var(--slate);
+    max-width: 500px; margin-bottom: 44px; line-height: 1.6;
+  }
+  .hero-actions { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .btn-primary {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--white); background: var(--graphite);
+    padding: 14px 28px; text-decoration: none;
+    border: 1px solid var(--graphite);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-ghost {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--slate); text-decoration: none;
+    border-bottom: 1px solid var(--border); padding-bottom: 2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .btn-ghost:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .hero-stat-row {
+    display: flex; gap: 0; margin-top: 60px; border-top: 1px solid var(--border);
+    max-width: 580px;
+  }
+  .hero-stat {
+    padding: 28px 36px 0 0; margin-right: 36px;
+    border-right: 1px solid var(--border);
+  }
+  .hero-stat:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+  .hero-stat-num {
+    font-family: 'IBM Plex Serif', serif; font-weight: 300;
+    font-size: 34px; color: var(--graphite);
+    display: block; line-height: 1; margin-bottom: 6px;
+  }
+  .hero-stat-label { font-size: 12px; color: var(--mid); max-width: 140px; line-height: 1.4; }
+
+  /* PROBLEM */
+  #problem { background: var(--graphite); }
+  #problem .section-label { color: #7bafd4; }
+  #problem h2 { color: rgba(255,255,255,0.9); }
+  #problem > .container > p { color: rgba(255,255,255,0.5); }
+  .problem-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: rgba(255,255,255,0.07);
+    margin-top: 48px; border: 1px solid rgba(255,255,255,0.07);
+  }
+  .problem-card {
+    background: var(--graphite); padding: 36px 32px;
+    border-top: 2px solid transparent;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .problem-card:hover { border-top-color: var(--accent); background: var(--navy); }
+  .problem-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: rgba(255,255,255,0.18); margin-bottom: 14px; display: block;
+  }
+  .problem-card h3 { color: rgba(255,255,255,0.85); margin-bottom: 8px; }
+  .problem-card p { font-size: 14px; color: rgba(255,255,255,0.42); }
+  .problem-footer {
+    color: rgba(255,255,255,0.28); font-size: 14px; margin-top: 32px;
+    font-style: italic; font-family: 'IBM Plex Serif', serif;
+  }
+
+  /* DEFINITION */
+  #definition { background: var(--white); }
+  .definition-box {
+    border: 1px solid var(--border); border-left: 4px solid var(--accent);
+    padding: 44px 52px; margin: 40px 0; background: var(--fog);
+  }
+  .definition-text {
+    font-family: 'IBM Plex Serif', serif; font-weight: 300;
+    font-size: clamp(18px, 2.2vw, 26px); line-height: 1.5; color: var(--graphite);
+  }
+  .definition-text strong { color: var(--accent); font-weight: 400; font-style: italic; }
+  .definition-individual {
+    background: var(--graphite); color: rgba(255,255,255,0.85);
+    padding: 28px 32px; margin-bottom: 36px;
+    border-left: 4px solid var(--accent);
+  }
+  .def-ind-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #7bafd4; margin-bottom: 12px; display: block;
+  }
+  .definition-individual p { color: rgba(255,255,255,0.65); font-size: 15px; line-height: 1.7; }
+  .not-list {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    margin-top: 40px; border: 1px solid var(--border);
+  }
+  .not-item {
+    padding: 24px; background: var(--white);
+    border-top: 2px solid transparent; transition: border-color 0.15s;
+  }
+  .not-item:hover { border-top-color: var(--border); }
+  .not-item.yes { background: var(--fog); }
+  .not-item.yes:hover { border-top-color: var(--accent); }
+  .not-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 8px; display: block;
+  }
+  .not-item.yes .not-label { color: var(--accent); }
+  .not-item h3 { font-size: 14px; }
+  .not-item p { font-size: 13px; margin-top: 6px; }
+
+  /* STACK */
+  #stack { background: var(--fog); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .stack-two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 64px; align-items: start; margin-top: 48px;
+  }
+  .stack-layers { display: flex; flex-direction: column; gap: 2px; }
+  .layer {
+    display: flex; align-items: center; gap: 18px;
+    padding: 16px 22px; background: var(--white);
+    border: 1px solid var(--border); border-left: 3px solid transparent;
+    transition: border-left-color 0.15s;
+  }
+  .layer:hover { border-left-color: var(--border); }
+  .layer.highlight {
+    background: var(--graphite); border-color: var(--graphite);
+    border-left-color: var(--accent);
+  }
+  .layer-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--mid); min-width: 20px;
+  }
+  .layer.highlight .layer-num { color: rgba(255,255,255,0.25); }
+  .layer-content { flex: 1; }
+  .layer-name { font-weight: 600; font-size: 13px; color: var(--graphite); }
+  .layer.highlight .layer-name { color: var(--white); }
+  .layer-desc { font-size: 12px; color: var(--mid); margin-top: 1px; }
+  .layer.highlight .layer-desc { color: rgba(255,255,255,0.4); }
+  .layer-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 8px; flex-shrink: 0;
+  }
+  .layer-tag.existing { background: var(--fog); color: var(--mid); border: 1px solid var(--border); }
+  .layer-tag.new { background: var(--accent); color: var(--white); }
+  .stack-prose h3 { font-size: 20px; margin-bottom: 14px; font-weight: 400;
+    font-family: 'IBM Plex Serif', serif; }
+  .stack-prose p { font-size: 15px; margin-bottom: 14px; }
+  .stack-callout {
+    background: var(--white); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); padding: 18px 22px; margin-top: 20px;
+  }
+  .stack-callout-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 8px; display: block;
+  }
+  .stack-callout p { font-size: 14px; color: var(--graphite); line-height: 1.55; }
+
+  /* LOOP */
+  #loop { background: var(--white); }
+  .loop-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border); margin-top: 48px;
+  }
+  .loop-step {
+    padding: 32px 24px; border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .loop-step:last-child { border-right: none; }
+  .loop-step-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--accent); margin-bottom: 18px; display: block;
+    font-weight: 600; letter-spacing: 0.08em;
+  }
+  .loop-step h3 { font-size: 15px; margin-bottom: 10px; }
+  .loop-step p { font-size: 13px; }
+  .loop-arrow {
+    position: absolute; right: -9px; top: 32px;
+    width: 18px; height: 18px; background: var(--white);
+    border: 1px solid var(--border); border-radius: 50%; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--accent);
+  }
+  .loop-step:last-child .loop-arrow { display: none; }
+  .loop-footer {
+    margin-top: 20px; padding: 14px 20px;
+    background: var(--fog); border: 1px solid var(--border);
+    font-size: 13px; font-style: italic;
+    font-family: 'IBM Plex Serif', serif; color: var(--mid);
+  }
+
+  /* WHY NOW */
+  #whynow { background: var(--navy); }
+  #whynow .section-label { color: #7bafd4; }
+  #whynow h2 { color: rgba(255,255,255,0.9); }
+  #whynow > .container > p { color: rgba(255,255,255,0.5); }
+  .why-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 1px; background: rgba(255,255,255,0.07);
+    margin-top: 48px; border: 1px solid rgba(255,255,255,0.07);
+  }
+  .why-item {
+    padding: 32px; background: var(--navy);
+    border-top: 2px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .why-item:hover { border-top-color: #7bafd4; background: #2a3a55; }
+  .why-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: rgba(255,255,255,0.18); margin-bottom: 12px; display: block;
+  }
+  .why-item h3 { color: rgba(255,255,255,0.82); font-size: 15px; margin-bottom: 8px; }
+  .why-item p { font-size: 14px; color: rgba(255,255,255,0.42); }
+
+  /* ECONOMIC */
+  #economic { background: var(--fog); border-top: 1px solid var(--border); }
+  .econ-grid {
+    display: grid; grid-template-columns: 260px 1fr;
+    gap: 56px; align-items: start; margin-top: 48px;
+  }
+  .econ-numbers { display: flex; flex-direction: column; }
+  .econ-stat {
+    padding: 22px 24px; background: var(--white);
+    border: 1px solid var(--border); border-bottom: none;
+  }
+  .econ-stat:last-child { border-bottom: 1px solid var(--border); }
+  .econ-stat-num {
+    font-family: 'IBM Plex Serif', serif; font-weight: 300;
+    font-size: 38px; color: var(--graphite);
+    display: block; line-height: 1; margin-bottom: 6px;
+  }
+  .econ-stat-desc { font-size: 12px; color: var(--mid); line-height: 1.4; }
+  .econ-text h3 {
+    font-family: 'IBM Plex Serif', serif; font-weight: 400;
+    font-size: 20px; color: var(--graphite); margin-bottom: 14px; line-height: 1.35;
+  }
+  .econ-text p { font-size: 15px; margin-bottom: 14px; }
+  .econ-compound {
+    background: var(--white); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 18px 22px; margin-bottom: 16px;
+  }
+  .econ-compound p { font-size: 14px; color: var(--graphite); }
+  .econ-compound strong { color: var(--graphite); }
+  .econ-gap {
+    background: var(--white); border: 1px solid var(--border);
+    border-left: 3px solid var(--warn); padding: 22px 26px;
+  }
+  .econ-gap-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--warn); margin-bottom: 10px; display: block;
+  }
+  .econ-gap p { font-size: 14px; margin-bottom: 10px; }
+  .econ-gap p:last-child { margin-bottom: 0; }
+  .econ-gap strong { color: var(--graphite); font-weight: 600; }
+  .econ-gap em { font-style: italic; }
+
+  /* GOVERNANCE */
+  #governance { background: var(--white); border-top: 1px solid var(--border); }
+  .gov-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    margin-top: 40px; border: 1px solid var(--border);
+  }
+  .gov-item {
+    padding: 26px; background: var(--white);
+    border-top: 2px solid transparent; transition: border-color 0.15s;
+  }
+  .gov-item:hover { border-top-color: var(--accent); }
+  .gov-item h3 { font-size: 13px; margin-bottom: 8px; }
+  .gov-item p { font-size: 13px; }
+
+  /* PRACTITIONERS */
+  #practitioners { background: var(--fog); border-top: 1px solid var(--border); }
+  .practitioners-intro {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 36px; align-items: end; margin-bottom: 4px;
+  }
+  .signal-note {
+    background: var(--white); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px; font-size: 13px;
+    font-style: italic; color: var(--mid);
+    font-family: 'IBM Plex Serif', serif; line-height: 1.55;
+  }
+  .scenario-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border);
+    margin-top: 32px; border: 1px solid var(--border);
+  }
+  .scenario {
+    background: var(--white); padding: 32px;
+    border-top: 2px solid transparent; transition: border-color 0.15s;
+  }
+  .scenario:hover { border-top-color: var(--accent); }
+  .scenario-industry {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px; display: block;
+  }
+  .scenario h3 { font-size: 15px; margin-bottom: 10px; }
+  .scenario-context { font-size: 13px; font-style: italic; color: var(--mid); margin-bottom: 14px; }
+  .scenario-before, .scenario-after {
+    font-size: 13px; padding: 13px 15px; margin-top: 7px; line-height: 1.6;
+  }
+  .scenario-before { background: #fdf4f4; border-left: 3px solid #d4a0a0; color: #6b3535; }
+  .scenario-after { background: var(--go-lt); border-left: 3px solid #7ab895; color: #1e4d35; }
+  .scenario-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 600; display: block; margin-bottom: 5px; opacity: 0.6;
+  }
+
+  /* MORE CASES */
+  #more-cases { background: var(--graphite); padding-top: 0; padding-bottom: 96px; }
+  .more-cases-inner {
+    border-top: 1px solid rgba(255,255,255,0.07); padding-top: 64px;
+  }
+  #more-cases .section-label { color: #7bafd4; }
+  .more-cases-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
+  }
+  #more-cases h2 { color: rgba(255,255,255,0.88); margin-bottom: 0; }
+  .more-cases-hint {
+    font-size: 11px; color: rgba(255,255,255,0.25);
+    font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.04em;
+  }
+  .more-grid { display: flex; flex-direction: column; gap: 1px; }
+  .more-card {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid transparent;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  }
+  .more-card:hover { background: rgba(255,255,255,0.055); }
+  .more-card.open { background: rgba(255,255,255,0.05); border-left-color: var(--accent); }
+  .more-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 26px; gap: 20px;
+  }
+  .more-card-industry {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(123,175,212,0.75); display: block; margin-bottom: 4px;
+  }
+  .more-card-title {
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 500;
+    color: rgba(255,255,255,0.75); margin: 0; line-height: 1.35;
+  }
+  .more-card-icon {
+    font-size: 18px; color: rgba(255,255,255,0.2);
+    min-width: 24px; text-align: center; line-height: 1;
+    transition: transform 0.25s, color 0.15s; user-select: none;
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+  }
+  .more-card.open .more-card-icon { transform: rotate(45deg); color: #7bafd4; }
+  .more-card-body {
+    display: none; padding: 0 26px 26px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .more-card.open .more-card-body { display: block; }
+  .more-card-context {
+    font-size: 13px; color: rgba(255,255,255,0.35); margin: 14px 0 12px;
+    font-style: italic; font-family: 'IBM Plex Serif', serif;
+  }
+  .more-before {
+    font-size: 13px; padding: 13px 15px; margin-bottom: 5px; line-height: 1.6;
+    background: rgba(176,58,46,0.14); border-left: 3px solid rgba(176,58,46,0.38);
+    color: rgba(255,210,205,0.8);
+  }
+  .more-after {
+    font-size: 13px; padding: 13px 15px; line-height: 1.6;
+    background: rgba(30,107,69,0.18); border-left: 3px solid rgba(122,184,149,0.42);
+    color: rgba(205,240,220,0.85);
+  }
+  .more-before .scenario-label { color: rgba(176,58,46,0.6); }
+  .more-after .scenario-label { color: rgba(122,184,149,0.65); }
+
+  /* NEWSLETTER */
+  #newsletter { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.07); }
+  #newsletter .section-label { color: #7bafd4; }
+  #newsletter h2 { color: rgba(255,255,255,0.88); }
+  #newsletter > .container > p { color: rgba(255,255,255,0.48); max-width: 460px; margin-bottom: 32px; font-size: 15px; }
+  .newsletter-form {
+    display: flex; max-width: 440px;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .newsletter-form input {
+    flex: 1; padding: 13px 16px; background: rgba(255,255,255,0.06);
+    border: none; color: var(--white);
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; outline: none;
+  }
+  .newsletter-form input::placeholder { color: rgba(255,255,255,0.28); }
+  .newsletter-form button {
+    padding: 13px 22px; background: var(--accent); color: var(--white);
+    border: none; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    transition: background 0.15s; white-space: nowrap;
+  }
+  .newsletter-form button:hover { background: #245c8a; }
+  .newsletter-sub {
+    font-size: 12px; margin-top: 10px; color: rgba(255,255,255,0.28);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* AIGNYTE */
+  #aignyte-cta { background: var(--fog); border-top: 1px solid var(--border); }
+  .aignyte-inner {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 48px; flex-wrap: wrap;
+  }
+  .aignyte-text { max-width: 500px; }
+  .aignyte-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 14px; display: block;
+  }
+  .aignyte-text h2 { font-size: 28px; margin-bottom: 12px; }
+  .aignyte-text p { font-size: 15px; }
+  .aignyte-action { padding-top: 6px; }
+  .aignyte-action .btn-primary { padding: 16px 32px; display: inline-block; }
+  .aignyte-action p { font-size: 12px; margin-top: 10px; color: var(--mid); }
+
+  /* FOOTER */
+  footer {
+    background: var(--graphite); padding: 28px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .footer-logo {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.38); display: flex; align-items: center; gap: 8px;
+  }
+  .footer-logo::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+  }
+  footer p { font-size: 12px; color: rgba(255,255,255,0.25); }
+  footer a { color: rgba(255,255,255,0.32); text-decoration: none; font-size: 12px; transition: color 0.15s; }
+  footer a:hover { color: rgba(255,255,255,0.65); }
+  .footer-links { display: flex; gap: 24px; }
+
+  /* REVEAL */
+  .reveal {
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .fade-in { opacity: 0; animation: fadeIn 0.55s ease forwards; }
+  .fade-in:nth-child(1) { animation-delay: 0.08s; }
+  .fade-in:nth-child(2) { animation-delay: 0.2s; }
+  .fade-in:nth-child(3) { animation-delay: 0.32s; }
+  .fade-in:nth-child(4) { animation-delay: 0.44s; }
+  .fade-in:nth-child(5) { animation-delay: 0.56s; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 800px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 20px; }
+    #hero::after { display: none; }
+    .problem-grid, .not-list, .loop-grid,
+    .why-grid, .scenario-grid, .stack-two-col,
+    .econ-grid, .gov-grid, .practitioners-intro { grid-template-columns: 1fr; }
+    .loop-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .loop-arrow { display: none; }
+    .hero-stat-row { flex-direction: column; }
+    .hero-stat { border-right: none; border-bottom: 1px solid var(--border); padding: 18px 0; margin: 0; }
+    .definition-box { padding: 26px 22px; }
+    footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+    .aignyte-inner { flex-direction: column; }
+    .more-cases-head { flex-direction: column; gap: 6px; }
+    /* Always show content on mobile — JS reveal is unreliable on iOS */
+    .reveal { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Message Decisioning</a>
+  <ul class="nav-links">
+    <li><a href="#problem">The Problem</a></li>
+    <li><a href="#definition">Definition</a></li>
+    <li><a href="#economic">Economic Case</a></li>
+    <li><a href="#stack">Architecture</a></li>
+    <li><a href="#practitioners">In Practice</a></li>
+  </ul>
+  <a class="nav-cta" href="#newsletter">Follow the Category</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <span class="hero-label fade-in">An emerging marketing category</span>
+      <h1 class="fade-in">Marketing knows <em>who</em>.<br>It still guesses <em>what to say</em>.</h1>
+      <p class="hero-sub fade-in">Every channel, audience, and timing signal is optimized. The actual message — the words a customer sees — is still written in advance and hoped for the best. Message Decisioning closes that gap.</p>
+      <div class="hero-actions fade-in">
+        <a class="btn-primary" href="#definition">Explore the Definition</a>
+        <a class="btn-ghost" href="#economic">Read the Economic Case</a>
+      </div>
+      <div class="hero-stat-row fade-in">
+        <div class="hero-stat">
+          <span class="hero-stat-num">$200B</span>
+          <span class="hero-stat-label">spent on direct marketing globally every year</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">&lt;1%</span>
+          <span class="hero-stat-label">of messages are truly personalized at the individual level</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">20–50%</span>
+          <span class="hero-stat-label">lift from message-level optimization</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <span class="section-label reveal">The Problem</span>
+    <h2 class="reveal">Messaging is the last thing<br>marketing optimized.</h2>
+    <p class="reveal" style="max-width:560px; font-size:17px; margin-bottom: 8px;">The industry built sophisticated systems for targeting, timing, and delivery. Then wrote the message weeks in advance and called it personalization.</p>
+    <div class="problem-grid reveal">
+      <div class="problem-card">
+        <span class="problem-num">01</span>
+        <h3>Static journeys can't adapt</h3>
+        <p>Customer journeys are locked at launch. When behavior changes between Monday and Friday, the message doesn't know. It fires anyway.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-num">02</span>
+        <h3>Rules written years ago</h3>
+        <p>Hand-coded if/then logic made sense at the scale of 2019. Today it creates irrelevant experiences for millions — and no one has time to rewrite it.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-num">03</span>
+        <h3>A/B tests that finish too late</h3>
+        <p>By the time your experiment reaches statistical significance, the campaign moment has passed and customer context has shifted entirely.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-num">04</span>
+        <h3>Messages pre-decided before reality happens</h3>
+        <p>Copy is written in a campaign brief — weeks before a customer does anything. The message has no idea what the customer did this morning.</p>
+      </div>
+    </div>
+    <p class="problem-footer reveal">That's why personalization remains a promise, not a reality. And why CAC keeps climbing.</p>
+  </div>
+</section>
+
+<!-- DEFINITION -->
+<section id="definition">
+  <div class="container">
+    <span class="section-label reveal">The Definition</span>
+    <h2 class="reveal">What is Message Decisioning?</h2>
+    <div class="definition-box reveal">
+      <p class="definition-text">
+        Message Decisioning is <strong>the decision layer</strong> between customer data and message delivery — the system that selects the right message for each individual, at the moment of interaction, and learns from every outcome.
+      </p>
+    </div>
+    <p class="reveal" style="max-width:600px; font-size:17px; margin-bottom: 36px;">
+      It doesn't write copy. It doesn't manage channels. It doesn't run campaigns.<br>
+      <strong style="color: var(--graphite);">It decides which message should be sent to this specific person, right now — and gets smarter every time.</strong>
+    </p>
+    <div class="definition-individual reveal">
+      <span class="def-ind-label">The unit of analysis is the individual — not the segment</span>
+      <p>Segmentation assigns people to groups. Message Decisioning operates on each person directly — reading their specific combination of signals, history, context, and behavior at the moment of interaction. Two people in the same segment, with the same product, at the same stage of their journey can receive completely different messages. Not because they belong to different sub-segments. Because they are different people.</p>
+    </div>
+    <div class="not-list reveal">
+      <div class="not-item">
+        <span class="not-label">Not this</span>
+        <h3>A/B Testing</h3>
+        <p>Picks a winner from two options, once, slowly. Message Decisioning selects from many options, for each individual, continuously.</p>
+      </div>
+      <div class="not-item">
+        <span class="not-label">Not this</span>
+        <h3>Personalization Tokens</h3>
+        <p>Merges a first name or segment into a template. Message Decisioning selects the message structure, tone, and content itself.</p>
+      </div>
+      <div class="not-item">
+        <span class="not-label">Not this</span>
+        <h3>Campaign Automation</h3>
+        <p>Executes pre-written messages at scheduled triggers. Message Decisioning decides what to execute at the moment of execution.</p>
+      </div>
+      <div class="not-item">
+        <span class="not-label">Not this</span>
+        <h3>Generative AI Copywriting</h3>
+        <p>Creates new message content on demand. Message Decisioning selects among available messages — it decides which to send, not what to write.</p>
+      </div>
+      <div class="not-item">
+        <span class="not-label">Not this</span>
+        <h3>Journey Orchestration</h3>
+        <p>Sequences the steps and timing of a customer journey. Message Decisioning determines the content of each step — not the order of steps.</p>
+      </div>
+      <div class="not-item yes">
+        <span class="not-label">This</span>
+        <h3>Individual-level selection</h3>
+        <p>Every customer gets the message best matched to their context, behavior, and history — from the available message inventory.</p>
+      </div>
+      <div class="not-item yes">
+        <span class="not-label">This</span>
+        <h3>Continuous optimization</h3>
+        <p>Each outcome — a click, a conversion, an ignore — teaches the system. The next decision is smarter than the last.</p>
+      </div>
+      <div class="not-item yes">
+        <span class="not-label">This</span>
+        <h3>Stack-agnostic layer</h3>
+        <p>Integrates between your data and your delivery channels. The missing layer — not a replacement for what you've already built.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+  <div class="container">
+    <span class="section-label reveal">Architecture</span>
+    <h2 class="reveal">The layer marketing<br>was always missing.</h2>
+    <p class="reveal" style="max-width:500px; font-size:17px;">Every other layer of the marketing stack was productized. One wasn't.</p>
+    <div class="stack-two-col reveal">
+      <div class="stack-layers">
+        <div class="layer">
+          <span class="layer-num">01</span>
+          <div class="layer-content">
+            <div class="layer-name">Data Layer</div>
+            <div class="layer-desc">CDPs, data warehouses, behavioral signals</div>
+          </div>
+          <span class="layer-tag existing">Existing</span>
+        </div>
+        <div class="layer">
+          <span class="layer-num">02</span>
+          <div class="layer-content">
+            <div class="layer-name">Audience &amp; Targeting</div>
+            <div class="layer-desc">Segmentation, lookalikes, suppression logic</div>
+          </div>
+          <span class="layer-tag existing">Existing</span>
+        </div>
+        <div class="layer highlight">
+          <span class="layer-num">03</span>
+          <div class="layer-content">
+            <div class="layer-name">Message Decisioning</div>
+            <div class="layer-desc">What to say to each individual, decided in real time</div>
+          </div>
+          <span class="layer-tag new">Missing</span>
+        </div>
+        <div class="layer">
+          <span class="layer-num">04</span>
+          <div class="layer-content">
+            <div class="layer-name">Delivery &amp; Automation</div>
+            <div class="layer-desc">ESPs, push platforms, SMS, in-app channels</div>
+          </div>
+          <span class="layer-tag existing">Existing</span>
+        </div>
+        <div class="layer">
+          <span class="layer-num">05</span>
+          <div class="layer-content">
+            <div class="layer-name">Analytics &amp; Measurement</div>
+            <div class="layer-desc">Attribution, reporting, campaign dashboards</div>
+          </div>
+          <span class="layer-tag existing">Existing</span>
+        </div>
+      </div>
+      <div class="stack-prose">
+        <h3>It complements your stack. It doesn't replace it.</h3>
+        <p>Message Decisioning plugs in between your customer data and your delivery infrastructure. Your existing tools keep doing what they do well.</p>
+        <p>What changes: messages are no longer written in advance and hoped for the best. They're decided at the moment each customer is reached — from a library of available options, optimized for that individual's context.</p>
+        <div class="stack-callout">
+          <span class="stack-callout-label">Key distinction</span>
+          <p>Other tools execute messages.<br>Message Decisioning decides which message to execute.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOOP -->
+<section id="loop">
+  <div class="container">
+    <span class="section-label reveal">How It Works</span>
+    <h2 class="reveal">The Decision Loop</h2>
+    <p class="reveal" style="max-width:500px; font-size:17px;">Every interaction follows a continuous loop. No frozen logic. No one-time experiments. Each cycle feeds the next.</p>
+    <div class="loop-grid reveal">
+      <div class="loop-step">
+        <div class="loop-arrow">›</div>
+        <span class="loop-step-num">Step 01</span>
+        <h3>Decide</h3>
+        <p>Evaluate the individual's context — behavior, history, timing, constraints — and select the best available message from the library.</p>
+      </div>
+      <div class="loop-step">
+        <div class="loop-arrow">›</div>
+        <span class="loop-step-num">Step 02</span>
+        <h3>Deliver</h3>
+        <p>Pass the selected message to your existing channel infrastructure. Email, push, SMS, in-app, web — no new pipes needed.</p>
+      </div>
+      <div class="loop-step">
+        <div class="loop-arrow">›</div>
+        <span class="loop-step-num">Step 03</span>
+        <h3>Observe</h3>
+        <p>Record the outcome — click, conversion, ignore, unsubscribe. Every signal matters, including silence.</p>
+      </div>
+      <div class="loop-step">
+        <span class="loop-step-num">Step 04</span>
+        <h3>Learn</h3>
+        <p>Update the model. The next decision for this individual — and others like them — is informed by what just happened.</p>
+      </div>
+    </div>
+    <div class="loop-footer reveal">This loop runs continuously — not once per campaign, not once per quarter. Every interaction improves the next decision.</div>
+  </div>
+</section>
+
+<!-- WHY NOW -->
+<section id="whynow">
+  <div class="container">
+    <span class="section-label reveal">Why Now</span>
+    <h2 class="reveal">This only became possible recently.</h2>
+    <p class="reveal" style="max-width:540px; font-size:17px; color: rgba(255,255,255,0.5);">Message Decisioning isn't a new idea. It's a newly feasible one. Four forces converged to make it practical at enterprise scale.</p>
+    <div class="why-grid reveal">
+      <div class="why-item">
+        <span class="why-num">01</span>
+        <h3>Data Density</h3>
+        <p>Enterprises now have years of historical data linking specific message elements to individual-level outcomes. The training data now exists.</p>
+      </div>
+      <div class="why-item">
+        <span class="why-num">02</span>
+        <h3>Model Capability</h3>
+        <p>AI can evaluate message-individual fit at the scale of millions of simultaneous decisions. Individual-level inference in real time is no longer computationally exotic.</p>
+      </div>
+      <div class="why-item">
+        <span class="why-num">03</span>
+        <h3>Economic Pressure</h3>
+        <p>Rising customer acquisition costs mean the cost of the wrong message has never been higher. Message-level optimization now has a clear and measurable ROI.</p>
+      </div>
+      <div class="why-item">
+        <span class="why-num">04</span>
+        <h3>Operational Feasibility</h3>
+        <p>Message selection can now be automated without armies of analysts. What previously required weeks of A/B testing now runs continuously in the background.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ECONOMIC -->
+<section id="economic">
+  <div class="container">
+    <span class="section-label reveal">The Economic Case</span>
+    <h2 class="reveal">Small lifts. Enormous impact.<br>Because campaigns repeat.</h2>
+    <div class="econ-grid reveal">
+      <div class="econ-numbers">
+        <div class="econ-stat">
+          <span class="econ-stat-num">20–30%</span>
+          <p class="econ-stat-desc">typical lift in response rates from message-level optimization</p>
+        </div>
+        <div class="econ-stat">
+          <span class="econ-stat-num">25–35%</span>
+          <p class="econ-stat-desc">improvement in conversion rates when messaging matches individual context</p>
+        </div>
+        <div class="econ-stat">
+          <span class="econ-stat-num">↓ CAC</span>
+          <p class="econ-stat-desc">each improvement reduces marginal acquisition cost across every future campaign</p>
+        </div>
+      </div>
+      <div class="econ-text">
+        <h3>Enterprise marketing is a repeating system, not a single event.</h3>
+        <p>Most enterprise programs run the same campaigns — acquisition, cross-sell, retention, reactivation — month after month, across millions of customers. That repetition is the key insight.</p>
+        <p>A lift in message response rate is modest in isolation. Compounded across 12 campaign cycles, across multiple product lines, across a customer base of millions — it becomes a material financial outcome. Message Decisioning doesn't just optimize a campaign. It improves a system that runs indefinitely.</p>
+        <div class="econ-compound">
+          <p><strong>The compounding principle:</strong> A message sent to 2 million customers, 10 times a year, with a 1% conversion rate improvement generates hundreds of thousands of additional conversions — without spending another dollar on media.</p>
+        </div>
+        <div class="econ-gap">
+          <span class="econ-gap-label">The Segmentation Value Gap</span>
+          <p>Most marketing programs treat message selection as a segmentation problem: divide the audience into buckets, assign a message to each bucket, test periodically. This approach feels rigorous. It leaves enormous value on the table.</p>
+          <p>Segmentation optimizes the <em>average</em> message for a group. But within every segment — no matter how precisely defined — individuals vary dramatically in what motivates them. A "high-value urban millennial" segment still contains people who respond to aspiration, people who respond to proof, people who respond to peer validation, and people who respond to simplicity. The segment gets one message. Most of them get the wrong one.</p>
+          <p><strong>Message Decisioning operates at the individual level — below the segment floor.</strong> It doesn't replace targeting strategy. It captures the value that targeting leaves behind.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GOVERNANCE -->
+<section id="governance">
+  <div class="container">
+    <span class="section-label reveal">Enterprise-Grade</span>
+    <h2 class="reveal">Built for regulated, complex environments.</h2>
+    <p class="reveal" style="max-width:560px; font-size:17px;">Decision automation in enterprise marketing must coexist with regulatory, brand, and operational controls. Message Decisioning is designed with this reality built in.</p>
+    <div class="gov-grid reveal">
+      <div class="gov-item">
+        <h3>Eligibility &amp; Compliance Rules</h3>
+        <p>Hard constraints — regulatory, legal, or policy-based — are enforced upstream of the decision layer. The system only selects from permissible options for each individual.</p>
+      </div>
+      <div class="gov-item">
+        <h3>Frequency &amp; Channel Controls</h3>
+        <p>Communication limits, suppression lists, and channel preferences are respected. Optimization happens within defined guardrails, not around them.</p>
+      </div>
+      <div class="gov-item">
+        <h3>Auditability &amp; Explainability</h3>
+        <p>Every decision can be traced. Why was this message sent to this individual? The system produces a clear record — important for brand, legal, and analytics teams.</p>
+      </div>
+      <div class="gov-item">
+        <h3>Policy-Safe Modeling</h3>
+        <p>Models are trained and evaluated against brand guidelines and regulatory constraints. Optimization targets outcomes, not just engagement metrics that can mislead.</p>
+      </div>
+      <div class="gov-item">
+        <h3>Workflow Integration</h3>
+        <p>Message Decisioning embeds directly into existing campaign execution systems. It doesn't require parallel infrastructure — it plugs into what you already operate.</p>
+      </div>
+      <div class="gov-item">
+        <h3>Secure Data Handling</h3>
+        <p>Customer-level signals are processed within enterprise data governance frameworks. No raw customer data needs to leave the environment for decisioning to function.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRACTITIONERS -->
+<section id="practitioners">
+  <div class="container">
+    <span class="section-label reveal">In Practice</span>
+    <h2 class="reveal">What it looks like in the real world.</h2>
+    <div class="practitioners-intro reveal">
+      <p style="font-size:17px;">The difference isn't theoretical. Here's how Message Decisioning changes outcomes for real marketing teams.</p>
+      <div class="signal-note">The system isn't assigning people to message buckets. It's reading each person's specific combination of signals — purchase history, browsing behavior, prior message responses, life context, communication style — and selecting the message that fits <em>that</em> individual. The same person can be price-sensitive <em>and</em> aspirational <em>and</em> recently anxious about a billing issue. The message reflects all of it.</div>
+    </div>
+    <div class="scenario-grid reveal">
+      <div class="scenario">
+        <span class="scenario-industry">Financial Services — Credit Card Acquisition</span>
+        <h3>The same offer. The message that makes it real is different for every person.</h3>
+        <p class="scenario-context">A bank prospects for a rewards card. Every qualified prospect sees the same product. What varies is every single message they receive.</p>
+        <div class="scenario-before">
+          <span class="scenario-label">Before</span>
+          "Earn 3X points on every purchase." One message, written for an imagined average. Sent to everyone. The traveler, the deal-hunter, the cautious first-timer, the parent stretching a budget — all receive the same words. Most don't respond. The system doesn't know why.
+        </div>
+        <div class="scenario-after">
+          <span class="scenario-label">With Message Decisioning</span>
+          One prospect has frequent flight searches, a recent hotel booking, and opened two prior travel-themed emails. Her message leads with where the points take her — not the rate. Another has comparison-shopped three cards this week and responded to a cashback offer last year. His message leads with proof: ranked against alternatives, with numbers. A third has no credit history and searched "how to build credit." Her message is calm and clear — what this card does, how approval works, no pressure. A fourth opened the last two emails but didn't click, and has a young child on the account. His message connects the card to family spending patterns — the everyday utility, not the aspirational use. None of these people were put in a segment. The system read each one individually and selected accordingly.
+        </div>
+      </div>
+      <div class="scenario">
+        <span class="scenario-industry">Financial Services — Personal Loan Acquisition</span>
+        <h3>Same rate. What converts each person is specific to them.</h3>
+        <p class="scenario-context">A lender targets pre-qualified prospects. The product is identical for all of them. The message that moves each one isn't.</p>
+        <div class="scenario-before">
+          <span class="scenario-label">Before</span>
+          "Get up to $25,000. Rates as low as 7.9%. Apply in minutes." The rate-and-amount frame — designed to be universally relevant, which means it's rarely specifically compelling. Low conversion despite a competitive offer.
+        </div>
+        <div class="scenario-after">
+          <span class="scenario-label">With Message Decisioning</span>
+          One prospect has three open credit card balances and searched debt consolidation twice this month. Her message is about relief — one payment, one rate, one less thing to manage. She's not being told about loan features; she's being shown a way out of a specific feeling. Another prospect recently searched home renovation contractors and has a mortgage. His message is about possibility — what he could do, framed as an investment in the place he already chose. A third opened the email, read to the bottom, and didn't apply — twice. His message this time leads with transparency: the exact monthly payment for the amount he'd likely qualify for, no surprises, no pressure. The rate is identical for all three. What makes it real to each of them is entirely different.
+        </div>
+      </div>
+      <div class="scenario">
+        <span class="scenario-industry">Telecom — Retention</span>
+        <h3>Churn prevention that doesn't train the whole base to expect a discount.</h3>
+        <p class="scenario-context">A carrier flags at-risk accounts. The instinct is to offer a discount. The cost of doing that to everyone is substantial — and it teaches customers that leaving is how you get a better deal.</p>
+        <div class="scenario-before">
+          <span class="scenario-label">Before</span>
+          "Stay and save $20/month." Sent to everyone flagged as at-risk. Works for some. For the rest, it either doesn't move them — or it successfully trains them to churn-and-return next cycle for another offer.
+        </div>
+        <div class="scenario-after">
+          <span class="scenario-label">With Message Decisioning</span>
+          One customer has been on the network for nine years, has never called support, and her churn signal is just reduced app usage. She doesn't need a discount — she needs acknowledgment. Her message is about her tenure: what it means, what it's worth, a quiet expression of appreciation with no ask attached. Another customer called support twice last month about a coverage gap and got transferred twice. His churn isn't about price — it's about a specific, unresolved frustration. His message addresses that directly: the issue, what changed, and what he can do if it happens again. A third customer has been price-comparing plans and responded to a discount offer two years ago. She is price-sensitive. She gets the offer — but only her. The system doesn't need a rule that says "discount sensitive customers." It reads the pattern and acts on it individually.
+        </div>
+      </div>
+      <div class="scenario">
+        <span class="scenario-industry">Insurance — Cross-sell</span>
+        <h3>The next product introduced through each person's actual frame of reference.</h3>
+        <p class="scenario-context">An insurer cross-sells home insurance to existing auto policyholders. Same product, same underwriting, same price range. What makes someone ready to hear about it depends entirely on who they are right now.</p>
+        <div class="scenario-before">
+          <span class="scenario-label">Before</span>
+          "Bundle your home and auto and save up to 15%." Written for the average customer. Sent to all eligible policyholders at 60 days post-auto-renewal. Resonant for almost no one specifically — and timed to the policy calendar, not to the customer's life.
+        </div>
+        <div class="scenario-after">
+          <span class="scenario-label">With Message Decisioning</span>
+          One customer closed on a home 47 days ago. She's in the thick of ownership — new locks, a basement that concerned her, a neighborhood she's still getting to know. Her message is about protection, not savings. Another customer has called twice to understand his coverage limits. He's a careful reader of policy documents and responded positively to detailed communications. His message is about completeness — one provider, one point of contact, full picture. A third customer is seven months into a significant home renovation and has an auto claim from last year. His message acknowledges the claim positively — handled well — and connects that experience to what comprehensive coverage would mean for a home under active renovation. None of this is demographic targeting. It's reading the actual signals each person has generated and selecting the message that meets them there.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MORE CASES -->
+<section id="more-cases">
+  <div class="container">
+    <div class="more-cases-inner">
+      <span class="section-label">More Use Cases</span>
+      <div class="more-cases-head">
+        <h2>Message Decisioning across industries.</h2>
+        <span class="more-cases-hint">Click any case to expand ↓</span>
+      </div>
+      <div class="more-grid">
+
+        <div class="more-card" onclick="toggleCard(this)">
+          <div class="more-card-header">
+            <div>
+              <span class="more-card-industry">Non-Profit — Donor Acquisition</span>
+              <h3 class="more-card-title">Finding first-time donors before they've given anywhere</h3>
+            </div>
+            <span class="more-card-icon">+</span>
+          </div>
+          <div class="more-card-body">
+            <p class="more-card-context">A nonprofit runs acquisition campaigns to prospect lists — lapsed event attendees, peer referrals, affiliated community members. Conversion from prospect to first-time donor is low.</p>
+            <div class="more-before">
+              <span class="scenario-label">Before</span>
+              "Your gift changes lives." Mission statement, impact photo, donation ask. The same appeal sent to everyone — designed to offend no one, and therefore specific to no one. The person who attended the gala, the one who was referred by a friend, and the one who googled the cause at midnight all receive the same words.
+            </div>
+            <div class="more-after">
+              <span class="scenario-label">With Message Decisioning</span>
+              One prospect attended the gala two years ago, engaged with two social posts about community impact, and has given to a local cause before. Her message is about belonging — she's already part of this, this is just the next step. Another prospect clicked through from a data-driven news article about program outcomes, spent four minutes on the impact report page, and has never donated anywhere. His message leads with numbers: what $50 funds specifically, how outcomes are measured, third-party validation. A third prospect was referred by a close friend who's a major donor. She's curious but skeptical — her browsing pattern shows she read the overhead ratio page twice. Her message doesn't ask her to give. It shows her what giving looks like from the inside: who decides, how it's spent, what accountability looks like. The mission is the same. The message is built for each person's specific combination of motivations and hesitations.
+            </div>
+          </div>
+        </div>
+
+        <div class="more-card" onclick="toggleCard(this)">
+          <div class="more-card-header">
+            <div>
+              <span class="more-card-industry">Non-Profit — Donor Retention</span>
+              <h3 class="more-card-title">Keeping donors giving — year after year</h3>
+            </div>
+            <span class="more-card-icon">+</span>
+          </div>
+          <div class="more-card-body">
+            <p class="more-card-context">A nonprofit's biggest revenue challenge isn't acquisition — it's lapse. A large percentage of first-year donors never give again. Renewal campaigns underperform not because the mission changed, but because the message doesn't remember who gave and why.</p>
+            <div class="more-before">
+              <span class="scenario-label">Before</span>
+              Annual appeal letter with year-end urgency. "Renew your support before December 31st." The same message to a lapsed first-year donor, a seven-year monthly giver, and someone who gave once after a disaster — all of whom gave for completely different reasons, and all of whom need a completely different reason to give again.
+            </div>
+            <div class="more-after">
+              <span class="scenario-label">With Message Decisioning</span>
+              One donor gave her first gift after watching a video about a specific family's story. She hasn't given since. Her renewal message reconnects to that story — what happened next, told specifically. Another donor has given monthly for six years, missed two months, and opened the last three emails without acting. His message acknowledges the relationship directly: what his cumulative giving has meant, not a generic annual summary. A third donor gave $500 after a specific crisis event two years ago and has never given outside that context. Her message isn't a renewal — it's an update on that exact situation, written as if the organization remembers why she gave in the first place. Because it does.
+            </div>
+          </div>
+        </div>
+
+        <div class="more-card" onclick="toggleCard(this)">
+          <div class="more-card-header">
+            <div>
+              <span class="more-card-industry">Financial Services — Collections</span>
+              <h3 class="more-card-title">Recovering payments without destroying relationships</h3>
+            </div>
+            <span class="more-card-icon">+</span>
+          </div>
+          <div class="more-card-body">
+            <p class="more-card-context">A lender sends collections communications across early, mid, and late delinquency. Repayment rates are low. The wrong tone at the wrong moment — for this specific person — damages the relationship and the brand.</p>
+            <div class="more-before">
+              <span class="scenario-label">Before</span>
+              Escalating urgency templates by delinquency bucket. "Your account is past due. Act now to avoid further consequences." Compliance-drafted, legally safe, humanly inert. The customer who missed a payment for the first time in nine years receives the same letter as the one who has missed six in a row.
+            </div>
+            <div class="more-after">
+              <span class="scenario-label">With Message Decisioning</span>
+              One customer has a nine-year payment history with no prior misses, called the support line last week, and has a joint account with a recent large hospital charge. Her message leads with acknowledgment — this is clearly unusual for her — and offers a clear, low-friction path to resolution without implying she's a credit risk. Another customer missed payments twice before, responded to a structured payment plan offer both times, and has been on a plan successfully. His message leads with the plan option, framed around what worked for him previously. A third is six weeks delinquent, has multiple accounts showing stress, and has never responded to a prior communication. His message is direct, clear, and unambiguous — no false warmth, no buried call to action. The regulatory floor is identical for all three. Everything above it — tone, structure, what the message leads with — is specific to each person's actual history and situation.
+            </div>
+          </div>
+        </div>
+
+        <div class="more-card" onclick="toggleCard(this)">
+          <div class="more-card-header">
+            <div>
+              <span class="more-card-industry">DTC Subscriptions — Wine, Pet Food &amp; More</span>
+              <h3 class="more-card-title">Converting trial customers into loyal subscribers</h3>
+            </div>
+            <span class="more-card-icon">+</span>
+          </div>
+          <div class="more-card-body">
+            <p class="more-card-context">A subscription brand acquires trial customers through promotions. The challenge: converting a discounted trial into a full-price, long-term subscriber. Churn after the first box is high — and indiscriminate discount offers make it worse.</p>
+            <div class="more-before">
+              <span class="scenario-label">Before</span>
+              "Your subscription renews in 7 days." Followed by a discount offer to prevent cancellation. Works for a small slice. For the rest, it either doesn't move them — or it works, but only by training them to cancel-and-rejoin whenever they want a deal.
+            </div>
+            <div class="more-after">
+              <span class="scenario-label">With Message Decisioning</span>
+              One customer rated three wines, spent time on the tasting notes page, and added two bottles to a wishlist. Her message is about what the curation is becoming — her specific palate profile, what the next box will reflect, the sense that someone is paying attention. Another customer ordered the trial, received it, and has had no further engagement. He's not disengaged — his open rate is fine — but nothing has connected yet. His message is practical: what the subscription actually costs per bottle, how it compares to what he'd otherwise buy, the flexibility to skip. A third customer ordered the trial as a gift, mentioned it in a post-purchase survey, and lives in a city with a strong gifting culture. Her message reframes the subscription entirely — not as something she maintains, but as something she gives. None of these people received a discount. The system identified who needed one — and who didn't — by reading their actual behavior, not by applying a rule.
+            </div>
+          </div>
+        </div>
+
+        <div class="more-card" onclick="toggleCard(this)">
+          <div class="more-card-header">
+            <div>
+              <span class="more-card-industry">Online Gaming — Monetization &amp; Retention</span>
+              <h3 class="more-card-title">Turning free players into paying ones — without burning them out</h3>
+            </div>
+            <span class="more-card-icon">+</span>
+          </div>
+          <div class="more-card-body">
+            <p class="more-card-context">A mobile or online game uses push notifications and in-game messages to drive purchases, re-engagement, and season pass upgrades. Blanket promotional messages are increasingly ignored — or lead to uninstalls.</p>
+            <div class="more-before">
+              <span class="scenario-label">Before</span>
+              "Don't miss the limited-time event! Get 2X gold this weekend only." Urgency-and-scarcity push sent to every player. High opt-out rate among casual players. Competitive players already knew. Lapsed players feel like they're being sold to, not welcomed back.
+            </div>
+            <div class="more-after">
+              <span class="scenario-label">With Message Decisioning</span>
+              One player logs in daily, completes every ranked match, and has checked the leaderboard 14 times this week without purchasing. His message is about exactly where he stands — his rank, the gap to the next tier, what it would unlock. It doesn't mention a sale. Another player plays primarily when her friends are online, has purchased twice after friend-activity notifications, and hasn't logged in for three weeks. Her message is about what her friends are doing right now — not an event, not a discount, a social pull. A third player has spent 40 hours in the lore sections of the game and has never made a purchase. His message introduces new story content that's genuinely relevant to the arc he's been following — framed as continuation, not upsell. A fourth player purchased the season pass last year, didn't this year, and has reduced play sessions since the new season launched. Her message addresses the gap directly: what's different this season from last, in the specific areas where she previously spent her time.
+            </div>
+          </div>
+        </div>
+
+        <div class="more-card" onclick="toggleCard(this)">
+          <div class="more-card-header">
+            <div>
+              <span class="more-card-industry">Streaming &amp; Media — Subscription Retention</span>
+              <h3 class="more-card-title">Keeping subscribers who are drifting, not yet gone</h3>
+            </div>
+            <span class="more-card-icon">+</span>
+          </div>
+          <div class="more-card-body">
+            <p class="more-card-context">A streaming service identifies subscribers showing low engagement. Churn risk is rising but they haven't cancelled yet. The window to re-engage them is narrow — and a generic content push often closes it.</p>
+            <div class="more-before">
+              <span class="scenario-label">Before</span>
+              "New this month on [Platform]." Generic content newsletter featuring the 3 titles marketing chose to promote. Sent to all low-engagement subscribers regardless of what they watched, when they drifted, or why they joined in the first place.
+            </div>
+            <div class="more-after">
+              <span class="scenario-label">With Message Decisioning</span>
+              One subscriber watched all six seasons of a legal drama, finished it three months ago, and hasn't started anything since. Her message isn't a top-10 list — it's one specific show, chosen because it shares the same writers, a similar moral complexity, and a cast member she's seen in two other things she rated highly. It arrives with enough context to feel like a recommendation from someone who was paying attention. Another subscriber has two young kids, watches in 20-minute sessions, and hasn't opened the app since his commute routine changed. His message isn't about content at all — it's about the mobile download feature, specifically for offline viewing on a commute. A third subscriber joined for a specific documentary series, finished it, and has browsed but never committed to anything else. Her message surfaces the next documentary the platform is releasing in her area of interest — not as a promotion, but as a heads-up. Each message is built from what that specific person actually did, not from a re-engagement template.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section id="newsletter">
+  <div class="container">
+    <span class="section-label reveal">Follow the Category</span>
+    <h2 class="reveal">Message Decisioning is emerging.<br>Follow its development.</h2>
+    <p class="reveal">Frameworks, case studies, and analysis on the discipline of message-level intelligence. No product pitches.</p>
+    <div class="newsletter-form reveal">
+      <input type="email" placeholder="your@email.com" />
+      <button type="button">Subscribe</button>
+    </div>
+    <p class="newsletter-sub reveal">For practitioners in marketing, analytics, and growth.</p>
+  </div>
+</section>
+
+<!-- AIGNYTE -->
+<section id="aignyte-cta">
+  <div class="container">
+    <div class="aignyte-inner reveal">
+      <div class="aignyte-text">
+        <span class="aignyte-tag">Contributing company</span>
+        <h2>Aignyte is pioneering<br>Message Decisioning.</h2>
+        <p>Aignyte is the company that coined this category and built the first production system for message-level AI decisioning at enterprise scale. Deployed across financial services, insurance, and telecom.</p>
+      </div>
+      <div class="aignyte-action">
+        <a class="btn-primary" href="https://www.aignyte.com">View Aignyte's Platform →</a>
+        <p>Use cases, architecture, and results.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">Message Decisioning</span>
+  <p>An independent educational resource for the marketing industry. © 2026</p>
+  <div class="footer-links">
+    <a href="https://www.aignyte.com">Aignyte.com</a>
+    <a href="#newsletter">Newsletter</a>
+    <a href="#definition">Category Definition</a>
+  </div>
+</footer>
+
+<script>
+  function toggleCard(card) {
+    const isOpen = card.classList.contains('open');
+    document.querySelectorAll('.more-card.open').forEach(c => c.classList.remove('open'));
+    if (!isOpen) card.classList.add('open');
+  }
+
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 50);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -28px 0px' });
+  reveals.forEach(el => observer.observe(el));
+
+  document.querySelector('.newsletter-form button').addEventListener('click', function() {
+    const input = document.querySelector('.newsletter-form input');
+    if (input.value && input.value.includes('@')) {
+      this.textContent = 'Subscribed ✓';
+      this.style.background = '#1e6b45';
+      input.value = ''; input.disabled = true; this.disabled = true;
+    } else {
+      input.style.outline = '2px solid rgba(255,255,255,0.5)';
+      setTimeout(() => input.style.outline = '', 1500);
+    }
+  });
+</script>
+</body>
+</html>
